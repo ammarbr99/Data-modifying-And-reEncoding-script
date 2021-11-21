@@ -1,0 +1,399 @@
+echo ''
+echo ''
+
+Write-Host "*************** Welcome ***************" -ForegroundColor Green
+echo ''
+Write-Host "Thank you for using the script - Ammar AL-Bar" -ForegroundColor Yellow
+echo ''
+Write-Host "to proceed you have to enter your user name correctly ... " -ForegroundColor Blue
+echo ''
+Write-Host "(input.txt), (scorm.js), and (scorm_evalutaio.js) must be at your desktop or you will not be able to log-in " -ForegroundColor White -BackgroundColor red
+echo ''
+
+while($true){
+$userName= Read-Host -Prompt "Enter your User Name " 
+
+
+
+$inputPath= -join('C:\Users\',$userName,'\Desktop\input.txt')
+$scormPath= -join('C:\Users\',$userName,'\Desktop\scorm.js')
+$scormEvPath=-join('C:\Users\',$userName,'\Desktop\scorm_evaluation.js')
+
+$testUser = Test-Path $inputPath
+$testScorm = Test-Path $scormPath
+$testScormEv =  Test-Path $scormEvPath
+
+if( ($testUser) -and ($testScorm) -and ($testScormEv)) {
+
+
+
+while($true){
+  
+
+Write-Host "1: do all " -ForegroundColor Blue
+Write-Host "2: change encoding to UTF-8 only" -ForegroundColor Blue
+Write-Host "3: delete imsmd: only " -ForegroundColor Blue
+Write-Host "4: replace scorm only " -ForegroundColor Blue
+Write-Host "5: replace scorm_evalution only " -ForegroundColor Blue
+Write-Host "6: change user name " -ForegroundColor Blue
+Write-Host "0: exit " -ForegroundColor Blue
+echo ''
+
+$choise= Read-Host -Prompt "please enter your choise"
+echo ''
+
+$data = @(
+    '\\hdscdc4n1h1\sabarepo\prod\content\content2\production_content_server\'
+    '\\hdscdc4n1h1\sabarepo\prod\content\sabaweb\content\production_content_server_\'
+)
+
+$index = @(
+    'content2'
+    'content'
+)
+
+
+if($choise -eq 1) {
+Write-Host "(do all) has been chosen" -ForegroundColor Yellow
+echo ''
+$inputPath= -join('C:\Users\',$userName,'\Desktop\input.txt')
+$scormPath= -join('C:\Users\',$userName,'\Desktop\scorm.js')
+$scormEvPath=-join('C:\Users\',$userName,'\Desktop\scorm_evaluation.js')
+
+$testUser = Test-Path $inputPath
+if($testUser){
+for ($k=0 ; $k -lt 2; $k++){
+
+
+$file_data = Get-Content $inputPath
+
+ for ($i=0 ; $i -lt $file_data.length; $i++) {
+       $temp = $file_data[$i]
+       $server= -join($data[$k],$temp)
+       $replace= -join($server,'\web\scripts\scorm.js')
+   $status = Test-Path $server
+if($status){
+   cd $server
+  (gc imsmanifest.xml) -replace 'imsmd:' , '' | out-file imsmanifest.xml
+   copy-Item $scormPath $replace
+   $path = -join($server,'\imsmanifest.xml')
+   $myText = Get-Content -Raw $path
+   $Utf8 = New-Object System.Text.UTF8Encoding $False
+   [System.IO.File]::WriteAllLines( $path, $myText, $Utf8)
+   echo $temp 'has been updated'
+echo ''  
+}
+else {
+ echo $temp ' dosnet exist at' $index[$k]
+ echo ''
+
+}
+  
+       
+  }
+
+if($k -lt 1) {
+echo ' now moving to the other server '
+echo ''
+}
+
+}
+
+
+
+
+
+$inputPath= -join('C:\Users\',$userName,'\Desktop\input.txt')
+$scormPath= -join('C:\Users\',$userName,'\Desktop\scorm.js')
+$scormEvPath = -join('C:\Users\',$userName,'\Desktop\scorm_evaluation.js')
+$testUser = Test-Path $inputPath
+  $file_data = Get-Content $inputPath
+  for ($k=0 ; $k -lt 2; $k++){
+
+ for ($i=0 ; $i -lt $file_data.length; $i++) {
+       $cnivn = $file_data[$i]
+       $saveLesson = $cnivn
+       $server= -join($data[$k],$cnivn,'\web\pages\modes')
+ $testServer = Test-Path $server
+if($testServer){
+$parentFolder = Get-ChildItem -Path $server
+for ($j=0 ; $j -lt $parentFolder.length; $j++) {
+ $lesson = $parentFolder[$j].name
+$assima_eval =  -join($server,'\',$lesson,'\assima_eval')
+$rep =  -join($assima_eval,'\scorm_evaluation.js')
+$status = Test-Path $rep
+if($status){
+copy-Item $scormEvPath   $rep
+  echo $saveLesson $lesson 'has been updated' ''
+}
+else{
+ echo  $saveLesson " is a course ! " ''
+}
+}
+}
+
+else {
+echo $saveLesson 'is not at' $index[$k] ''
+}
+
+
+}
+echo 'moving to the next server' ''
+}
+
+}
+
+
+
+else {
+Write-Host "Wrong User Name, please try again (6)" -ForegroundColor Red
+echo ''
+continue
+
+}
+
+
+}
+
+
+
+
+if($choise -eq 2) {
+Write-Host "(UTF-8 only) has been chosen" -ForegroundColor Yellow
+echo ''
+$inputPath= -join('C:\Users\',$userName,'\Desktop\input.txt')
+$scormPath= -join('C:\Users\',$userName,'\Desktop\scorm.js')
+$scormEvPath=-join('C:\Users\',$userName,'\Desktop\scorm_evaluation.js')
+$testUser = Test-Path $inputPath
+if($testUser){
+for ($k=0 ; $k -lt 2; $k++){
+
+
+$file_data = Get-Content $inputPath
+ for ($i=0 ; $i -lt $file_data.length; $i++) {
+       $temp = $file_data[$i]
+       $server= -join($data[$k],$temp)
+       $replace= -join($server,'\web\scripts\scorm.js')
+   $status = Test-Path $server
+if($status){
+   cd $server
+   $path = -join($server,'\imsmanifest.xml')
+   $myText = Get-Content -Raw $path
+   $Utf8 = New-Object System.Text.UTF8Encoding $False
+   [System.IO.File]::WriteAllLines( $path, $myText, $Utf8)
+   echo $temp 'has been updated'
+echo ''  
+}
+else {
+ echo $temp ' dosnet exist at' $index[$k]
+ echo ''
+
+}
+  
+       
+  }
+
+if($k -lt 1) {
+echo ' now moving to the other server '
+echo ''
+}
+
+}
+
+}
+else{
+Write-Host "Wrong User Name, please try again (6)" -ForegroundColor Red
+echo ''
+continue
+}
+
+
+
+}
+
+
+if($choise -eq 3) {
+
+Write-Host "(delete imsmd: only) has been chosen" -ForegroundColor Yellow
+echo ''
+$inputPath= -join('C:\Users\',$userName,'\Desktop\input.txt')
+$scormPath= -join('C:\Users\',$userName,'\Desktop\scorm.js')
+$scormEvPath=-join('C:\Users\',$userName,'\Desktop\scorm_evaluation.js')
+$testUser = Test-Path $inputPath
+if($testUser){
+for ($k=0 ; $k -lt 2; $k++){
+
+
+$file_data = Get-Content $inputPath
+ for ($i=0 ; $i -lt $file_data.length; $i++) {
+       $temp = $file_data[$i]
+       $server= -join($data[$k],$temp)
+       $replace= -join($server,'\web\scripts\scorm.js')
+   $status = Test-Path $server
+if($status){
+   cd $server
+  (gc imsmanifest.xml) -replace 'imsmd:' , '' | out-file imsmanifest.xml
+   echo $temp 'has been updated'
+echo ''  
+}
+else {
+ echo $temp ' dosnet exist at' $index[$k]
+ echo ''
+
+}
+  
+       
+  }
+
+if($k -lt 1) {
+echo ' now moving to the other server '
+echo ''
+}
+
+}
+
+}
+else{
+Write-Host "Wrong User Name, please try again (6)" -ForegroundColor Red
+echo ''
+continue
+}
+
+
+}
+
+
+if($choise -eq 4) {
+
+Write-Host "(replace scorm only) has been chosen" -ForegroundColor Yellow
+echo ''
+
+$inputPath= -join('C:\Users\',$userName,'\Desktop\input.txt')
+$scormPath= -join('C:\Users\',$userName,'\Desktop\scorm.js')
+$scormEvPath=-join('C:\Users\',$userName,'\Desktop\scorm_evaluation.js')
+$testUser = Test-Path $inputPath
+if($testUser){
+for ($k=0 ; $k -lt 2; $k++){
+
+
+$file_data = Get-Content $inputPath
+ for ($i=0 ; $i -lt $file_data.length; $i++) {
+       $temp = $file_data[$i]
+       $server= -join($data[$k],$temp)
+       $replace= -join($server,'\web\scripts\scorm.js')
+   $status = Test-Path $server
+if($status){
+   cd $server
+   copy-Item $scormPath $replace
+   echo $temp 'has been updated'
+echo ''  
+}
+else {
+ echo $temp ' dosnet exist at' $index[$k]
+ echo ''
+
+}
+  
+       
+  }
+
+if($k -lt 1) {
+echo ' now moving to the other server '
+echo ''
+}
+
+}
+
+}
+else{
+Write-Host "Wrong User Name, please try again (6)" -ForegroundColor Red
+echo ''
+continue
+}
+
+
+
+
+}
+
+
+if($choise -eq 5) {
+
+Write-Host "(replace scorm evalutaion only) has been chosen" -ForegroundColor Yellow
+echo ''
+
+$inputPath= -join('C:\Users\',$userName,'\Desktop\input.txt')
+$scormPath= -join('C:\Users\',$userName,'\Desktop\scorm.js')
+$scormEvPath = -join('C:\Users\',$userName,'\Desktop\scorm_evaluation.js')
+$testUser = Test-Path $inputPath
+
+if($testUser){
+$file_data = Get-Content $inputPath
+  for ($k=0 ; $k -lt 2; $k++){
+
+ for ($i=0 ; $i -lt $file_data.length; $i++) {
+       $cnivn = $file_data[$i]
+       $saveLesson = $cnivn
+       $server= -join($data[$k],$cnivn,'\web\pages\modes')
+ $testServer = Test-Path $server
+if($testServer){
+$parentFolder = Get-ChildItem -Path $server
+for ($j=0 ; $j -lt $parentFolder.length; $j++) {
+ $lesson = $parentFolder[$j].name
+$assima_eval =  -join($server,'\',$lesson,'\assima_eval')
+$rep =  -join($assima_eval,'\scorm_evaluation.js')
+$status = Test-Path $rep
+if($status){
+copy-Item $scormEvPath   $rep
+  echo $saveLesson $lesson 'has been updated' ''
+}
+else{
+ echo  $saveLesson " is a course ! " ''
+}
+}
+}
+
+else {
+echo $saveLesson 'is not at' $index[$k] ''
+}
+
+
+}
+echo 'moving to the next server' ''
+}
+}
+else{
+
+Write-Host "Wrong User Name, please try again (6)" -ForegroundColor Red
+echo ''
+continue
+}
+     
+}
+
+
+if($choise -eq 0) {
+echo ''
+Write-Host "Thank you for using the script" -ForegroundColor Yellow
+exit
+break
+}
+
+if($choise -eq 6){
+echo ''
+$userName= Read-Host -Prompt "Enter new User Name "
+
+}
+
+$choise=20
+
+}
+
+}
+
+else {
+Write-Host "Wrong User Name, please try again " -ForegroundColor Red
+echo ''
+}
+
+}
